@@ -1,6 +1,7 @@
 package br.com.jg.advancedquiz.service;
 
 import br.com.jg.advancedquiz.dto.JsonQuestionDTO;
+import br.com.jg.advancedquiz.mapper.QuestionMapper;
 import br.com.jg.advancedquiz.model.Alternative;
 import br.com.jg.advancedquiz.model.Question;
 import br.com.jg.advancedquiz.repository.AlternativeRepository;
@@ -20,13 +21,15 @@ public class QuestionService {
 
     private final QuestionRepository questionRepository;
     private final QuestionJsonService questionJsonService;
+    private final QuestionMapper questionMapper;
     private final AlternativeRepository alternativeRepository;
     private final AlternativeService alternativeService;
 
 
-    public QuestionService(QuestionRepository questionRepository, QuestionJsonService questionJsonService, AlternativeRepository alternativeRepository, AlternativeService alternativeService) {
+    public QuestionService(QuestionRepository questionRepository, QuestionJsonService questionJsonService, QuestionMapper questionMapper, AlternativeRepository alternativeRepository, AlternativeService alternativeService) {
         this.questionRepository = questionRepository;
         this.questionJsonService = questionJsonService;
+        this.questionMapper = questionMapper;
         this.alternativeRepository = alternativeRepository;
         this.alternativeService = alternativeService;
     }
@@ -36,13 +39,13 @@ public class QuestionService {
         if (question.isEmpty()){
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Nenhuma questão na lista");
         }else {
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(question);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(questionMapper.questionDTOS(question));
         }
     }
     public ResponseEntity getOneQuestion(long id){
         Optional<Question> question = questionRepository.findById(id);
         if (question.isPresent()){
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(question);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(questionMapper.questionDTO(question.get()));
         }else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhuma questão encontrada com esse Id");
         }
@@ -65,6 +68,6 @@ public class QuestionService {
                 questions.remove(q);
             }
         }
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body("Savede");
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body("Saved");
     }
 }

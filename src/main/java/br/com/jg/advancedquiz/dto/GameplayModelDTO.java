@@ -1,5 +1,7 @@
-package br.com.jg.advancedquiz.model;
+package br.com.jg.advancedquiz.dto;
 
+import br.com.jg.advancedquiz.model.Player;
+import br.com.jg.advancedquiz.model.QuestionGameplay;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,24 +9,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
-@Table(name = "Gameplay")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GameplayModel {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+public class GameplayModelDTO {
     private Long id;
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private QuestionGameplay questions;
-    @ManyToOne
     private Player player;
     private long highestScore;
     private boolean userFinished;
-    @Column(columnDefinition = "bigint default 0")
     private long questionsCorrectCount;
 }

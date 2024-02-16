@@ -2,6 +2,7 @@ package br.com.jg.advancedquiz.service;
 
 import br.com.jg.advancedquiz.dto.LoginDto;
 import br.com.jg.advancedquiz.dto.RegisterDTO;
+import br.com.jg.advancedquiz.mapper.PlayerMapper;
 import br.com.jg.advancedquiz.model.Player;
 import br.com.jg.advancedquiz.repository.PlayerRepository;
 import org.apache.commons.codec.EncoderException;
@@ -15,11 +16,25 @@ import java.util.Optional;
 @Service
 public class PlayerService {
     private final PlayerRepository playerRepository;
+    private final PlayerMapper playerMapper;
     private final Base64 base64;
 
-    public PlayerService(PlayerRepository playerRepository, Base64 base64) {
+    public PlayerService(PlayerRepository playerRepository, PlayerMapper playerMapper, Base64 base64) {
         this.playerRepository = playerRepository;
+        this.playerMapper = playerMapper;
         this.base64 = base64;
+    }
+    public ResponseEntity getPlayer(long playerId){
+        if (playerRepository.findById(playerId).isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum jogador encontrado com esse ID");
+        }
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(playerMapper.toDTO(playerRepository.findById(playerId).get()));
+    }
+    public ResponseEntity getAllplayers(){
+        if(playerRepository.findAll().isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum jogador encontrado");
+        }
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(playerMapper.toListDTO(playerRepository.findAll()));
     }
     public ResponseEntity savePlayer(RegisterDTO registerDTO) throws EncoderException {
         Player player = new Player();

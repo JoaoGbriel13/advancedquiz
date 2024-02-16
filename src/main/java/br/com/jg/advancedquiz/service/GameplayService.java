@@ -2,6 +2,8 @@ package br.com.jg.advancedquiz.service;
 
 
 import br.com.jg.advancedquiz.dto.StartGameplayDTO;
+import br.com.jg.advancedquiz.mapper.GameplayMapper;
+import br.com.jg.advancedquiz.mapper.QuestionGameplayMapper;
 import br.com.jg.advancedquiz.model.*;
 import br.com.jg.advancedquiz.repository.*;
 import org.springframework.http.HttpStatus;
@@ -19,14 +21,18 @@ public class GameplayService {
     private final QuestionRepository questionRepository;
     private final GameplayModelRepository gameplayModelRepository;
     private final QuestionGameplayRepository questionGameplayRepository;
+    private final QuestionGameplayMapper questionGameplayMapper;
+    private final GameplayMapper gameplayMapper;
 
     public GameplayService(PlayerRepository playerRepository, QuestionRepository questionRepository,
                            GameplayModelRepository gameplayModelRepository,
-                           QuestionGameplayRepository questionGameplayRepository) {
+                           QuestionGameplayRepository questionGameplayRepository, QuestionGameplayMapper questionGameplayMapper, GameplayMapper gameplayMapper) {
         this.playerRepository = playerRepository;
         this.questionRepository = questionRepository;
         this.gameplayModelRepository = gameplayModelRepository;
         this.questionGameplayRepository = questionGameplayRepository;
+        this.questionGameplayMapper = questionGameplayMapper;
+        this.gameplayMapper = gameplayMapper;
     }
 
     public ResponseEntity startGameplay(StartGameplayDTO startGameplayDTO) {
@@ -41,7 +47,7 @@ public class GameplayService {
             questionGameplayRepository.save(q);
             gameplayModel.setQuestions(q);
         }
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(gameplayModelRepository.save(gameplayModel));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(gameplayMapper.toDTO(gameplayModelRepository.save(gameplayModel)));
     }
     private List<QuestionGameplay> assignQuestions(GameplayModel gameplayModel){
         List<Question> questionsToPlay = questionRepository.getQuestionsByDifficulty("easy",6);
@@ -60,10 +66,10 @@ public class GameplayService {
     }
 
     public ResponseEntity getGameplay(long id){
-        if (gameplayModelRepository.findById(id).isEmpty() || gameplayModelRepository.findById(id).get().isUserFinished()){
+        if (gameplayModelRepository.findById(id).isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhuma gameplay encontrada");
         }
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(gameplayModelRepository.findById(id).get());
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(gameplayMapper.toDTO(gameplayModelRepository.findById(id).get()));
     }
 
 
@@ -76,7 +82,7 @@ public class GameplayService {
             return ResponseEntity.status(HttpStatus.ACCEPTED).body("Não há mais questões ativas para a sessão atual");
         }
         QuestionGameplay questionGameplay = questionGameplayRepository.getActiveQuestion(gameplayModel.get().getId());
-        long actualScore = gameplayModel.get().getHighestScore();
+        long actualScore = gameplayMapper.toDTO(gameplayModel.get()).getHighestScore();
 
         if (questionGameplay.getQuestion().getCorrectQuestionAlternativeID() == selectedAlternativeId){
             return handleCorrectAnswer(questionGameplay, gameplayModel.get());
@@ -92,9 +98,17 @@ public class GameplayService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhuma gameplay ativa encontrada");
         }
         QuestionGameplay questionGameplay = questionGameplayRepository.getActiveQuestion(gameplayModel.getId());
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body("A questão é:"+ questionGameplay.getQuestion().getQuestion() +
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body("A questão é:"+
+                questionGameplayMapper.toDTO(questionGameplay)
+                .getQuestion()
+                .getQuestion() +
                 "As alternativas são:" +
-                questionGameplay.getQuestion().getAlternatives().stream().map(a -> a.getId() + "- " + a.getDescription()).toList()
+                questionGameplayMapper.toDTO(questionGameplay)
+                        .getQuestion()
+                        .getAlternatives()
+                        .stream()
+                        .map(a -> a.getId() + "- " + a.getDescription())
+                        .toList()
         );
     }
     private ResponseEntity handleCorrectAnswer(QuestionGameplay questionGameplay, GameplayModel gameplayModel){
@@ -146,7 +160,8 @@ public class GameplayService {
             nextQuestion.setActive(true);
             gameplayModelRepository.save(gameplayModel);
             questionGameplayRepository.save(questionGameplay);
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body("Você acertou a questão! " + gameplayModel.getHighestScore());
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body("Você acertou a questão! " + gameplayMapper.toDTO(gameplayModel)
+                    .getHighestScore());
         }
     }
 
