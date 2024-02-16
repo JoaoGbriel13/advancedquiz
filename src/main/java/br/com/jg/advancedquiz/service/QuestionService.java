@@ -36,17 +36,18 @@ public class QuestionService {
         if (question.isEmpty()){
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Nenhuma questão na lista");
         }else {
-            return ResponseEntity.status(HttpStatus.FOUND).body(question);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(question);
         }
     }
     public ResponseEntity getOneQuestion(long id){
         Optional<Question> question = questionRepository.findById(id);
         if (question.isPresent()){
-            return ResponseEntity.status(HttpStatus.FOUND).body(question);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(question);
         }else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhuma questão encontrada com esse Id");
         }
     }
+
 
     public ResponseEntity saveQuestions() throws JsonProcessingException {
         List<JsonQuestionDTO> questions = questionJsonService.getFromApi();
@@ -64,6 +65,6 @@ public class QuestionService {
                 questions.remove(q);
             }
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(questions);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body("Savede");
     }
 }

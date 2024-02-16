@@ -13,7 +13,7 @@ import java.util.List;
 public class QuestionJsonService {
     protected List<JsonQuestionDTO> getFromApi() throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> responseEntity = restTemplate.getForEntity("https://opentdb.com/api.php?amount=10&category=21&difficulty=medium&type=multiple",
+        ResponseEntity<String> responseEntity = restTemplate.getForEntity("https://opentdb.com/api.php?amount=50&type=multiple",
                 String.class);
 
         ObjectMapper mapper = new ObjectMapper();

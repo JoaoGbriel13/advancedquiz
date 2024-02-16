@@ -6,21 +6,23 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
-
 @Entity
-@Table(name = "Players")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class Player {
+public class QuestionGameplay {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
-    private String nickname;
-    private String password;
-    @Column(columnDefinition = "bigint default 0")
-    private Long wins;
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    private GameplayModel gameplayModel;
+    @ManyToOne
+    private Question question;
+    private boolean active;
+    private boolean playerWon;
+
+    public QuestionGameplay(Question question, boolean active) {
+    }
 }

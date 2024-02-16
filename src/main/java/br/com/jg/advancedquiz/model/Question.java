@@ -25,6 +25,7 @@ public class Question {
     private String category;
     private String question;
     @OneToMany(targetEntity = Alternative.class)
+    @ToString.Exclude
     private Set<Alternative> alternatives;
     private long correctQuestionAlternativeID;
 

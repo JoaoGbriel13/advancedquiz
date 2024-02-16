@@ -1,70 +1,78 @@
-# Aplicação de Quiz Avançado
+# Advanced Quiz - README
 
-Esta é uma aplicação Spring Boot que oferece uma plataforma de quiz avançada. A aplicação busca perguntas da Open Trivia Database, processa e as armazena em um banco de dados, permitindo que os usuários as acessem e respondam.
+## Descrição
 
-## Sumário
-- [Introdução](#introdução)
-- [Recursos](#recursos)
-- [Endpoints](#endpoints)
-- [DTOs e Modelos](#dtos-e-modelos)
-- [Repositórios](#repositórios)
-- [Serviços](#serviços)
-- [Diagrama Mermaid](#diagrama-mermaid)
+O Advanced Quiz é um jogo de perguntas e respostas com o estilo do programa "Show do Milhão". O objetivo do jogo é que o usuário acumule 1 milhão de pontos respondendo corretamente às perguntas.
 
-## Introdução
-A aplicação utiliza o Spring Boot para criar uma API RESTful para gerenciar e fornecer perguntas de quiz avançado. Ela busca perguntas da API da Open Trivia Database, processa-as e as armazena em um banco de dados relacional. Os usuários podem acessar as perguntas por meio de vários endpoints.
+## Funcionalidades
 
-## Recursos
-- Busca perguntas da API da Open Trivia Database.
-- Armazena perguntas e suas alternativas em um banco de dados relacional.
-- Fornece endpoints para recuperar todas as perguntas, recuperar uma única pergunta por ID e salvar novas perguntas.
+1. **Cadastro e Login de Usuários:**
+    - Os usuários podem se cadastrar fornecendo um apelido (nickname) e uma senha.
+    - O login é realizado comparando o apelido e a senha cadastrados.
 
-## Endpoints
-### 1. Obter Todas as Perguntas
-   - **Endpoint:** `/questions/all`
-   - **Método:** `GET`
-   - **Descrição:** Recupera todas as perguntas armazenadas no banco de dados.
+2. **Perguntas e Alternativas:**
+    - As perguntas são obtidas de uma API externa e salvas no banco de dados.
+    - Cada pergunta possui um conjunto de alternativas, sendo uma correta e as demais incorretas.
 
-### 2. Obter Uma Pergunta por ID
-   - **Endpoint:** `/questions/{id}`
-   - **Método:** `GET`
-   - **Descrição:** Recupera uma única pergunta pelo seu ID.
+3. **Gameplay:**
+    - Os usuários podem iniciar um novo jogo, recebendo uma série de perguntas de diferentes dificuldades (fácil, médio e difícil).
+    - A cada pergunta respondida corretamente, o usuário acumula pontos com base na dificuldade da pergunta.
 
-### 3. Salvar Perguntas
-   - **Endpoint:** `/questions`
-   - **Método:** `POST`
-   - **Descrição:** Busca perguntas da Open Trivia Database, processa-as e as salva no banco de dados.
+4. **Pontuação:**
+    - A pontuação é calculada conforme a dificuldade da pergunta:
+        - Fácil: 1000 pontos
+        - Médio: 10000 pontos
+        - Difícil: 100000 pontos
+    - A pontuação mais alta é atualizada a cada resposta correta.
+    - Quando a pontuação atinge 5000, 50000 ou 500000 pontos, ela é dobrada.
 
-## DTOs e Modelos
-### 1. JsonQuestionDTO
-   - Representa a estrutura de uma pergunta em formato JSON obtida da Open Trivia Database.
+5. **Vitória e Resultados:**
+    - O jogo é vencido quando o usuário atinge 1 milhão de pontos.
+    - O usuário pode visualizar o resultado após cada pergunta, indicando se acertou ou errou.
 
-### 2. Alternative
-   - Representa uma alternativa para uma pergunta, incluindo uma descrição e se é correta.
+## Endpoints da API
 
-### 3. Player
-   - Representa um jogador participante do quiz, incluindo um apelido e pontuação.
+1. **/player:**
+    - **POST /save:** Cadastra um novo jogador.
+    - **POST /login:** Realiza o login do jogador.
 
-### 4. Question
-   - Representa uma pergunta, incluindo dificuldade, categoria, texto da pergunta, um conjunto de alternativas e o ID da alternativa correta.
+2. **/questions:**
+    - **GET /all:** Obtém todas as perguntas cadastradas.
+    - **GET /{id}:** Obtém uma pergunta específica por ID.
+    - **POST :** Salva novas perguntas obtidas da API externa.
 
-### 5. User
-   - Representa um usuário no sistema, incluindo um nome, nome completo e idade.
+3. **/gameplay:**
+    - **GET /get-gameplay/{id}:** Obtém os detalhes de uma sessão de jogo.
+    - **GET /activequestion/{gameplayId}:** Obtém a pergunta ativa de uma sessão de jogo.
+    - **POST /start:** Inicia uma nova sessão de jogo para um jogador.
+    - **POST /{gameplayId}/{alternativeId}:** Verifica se a alternativa selecionada está correta.
 
-## Repositórios
-### 1. AlternativeRepository
-   - Gerencia a persistência de entidades de alternativa.
+## Configurações
 
-### 2. QuestionRepository
-   - Gerencia a persistência de entidades de pergunta.
+1. **Base64Config:**
+    - Configuração para fornecer uma instância de Base64.
 
-## Serviços
-### 1. AlternativeService
-   - Lida com a criação e persistência de entidades de alternativa.
+2. **CorsConfig:**
+    - Configuração para permitir requisições do frontend, habilitando CORS.
 
-### 2. QuestionJsonService
-   - Recupera perguntas em formato JSON da API da Open Trivia Database.
+## Criptografia da Senha
 
-### 3. QuestionService
-   - Gerencia a recuperação e persistência de perguntas, integrando-se com `AlternativeService` e `QuestionJsonService`.
+A senha do usuário é criptografada usando a biblioteca Apache Commons Codec e o algoritmo Base64. A classe `Base64Config` fornece uma instância do codificador e decodificador Base64.
 
+Ao salvar a senha do usuário, ela é convertida para bytes e codificada usando o algoritmo Base64. Durante o processo de login, a senha fornecida pelo usuário é codificada da mesma forma e comparada com a senha armazenada no banco de dados.
+
+Isso proporciona uma camada adicional de segurança, garantindo que as senhas não sejam armazenadas em texto simples no banco de dados.
+
+## Observações
+
+- O jogo possui lógica para dobrar a pontuação ao atingir 5000, 50000 e 500000 pontos.
+- O código pode ser estendido e aprimorado para incluir mais funcionalidades e melhorar a experiência do usuário.
+
+## Como Executar
+
+1. Clone o repositório.
+2. Certifique-se de ter um banco de dados configurado e ajuste as configurações do Spring Boot, se necessário.
+3. Execute a aplicação Spring Boot.
+4. Acesse os endpoints da API conforme a descrição acima.
+
+Lembre-se de adaptar e ajustar o código conforme necessário para atender aos requisitos específicos do seu projeto.
