@@ -9,4 +9,5 @@ import java.util.Optional;
 
 public interface PlayerRepository extends JpaRepository<Player, Long> {
     Optional<Player> findByNicknameAndPassword(String nickname, String password);
+    Optional<Player> findByNickname(String nickname);
 }

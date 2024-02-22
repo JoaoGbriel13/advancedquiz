@@ -21,6 +21,6 @@ public class Player {
     private Long id;
     private String nickname;
     private String password;
-    @Column(columnDefinition = "bigint default 0")
-    private Long wins;
+    @Column
+    private long wins;
 }

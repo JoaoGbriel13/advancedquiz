@@ -39,17 +39,21 @@ public class PlayerService {
     public ResponseEntity savePlayer(RegisterDTO registerDTO) throws EncoderException {
         Player player = new Player();
         player.setPassword(base64.encodeAsString(registerDTO.getPassword().getBytes()));
+        if (playerRepository.findByNickname(registerDTO.getNickname()).isPresent()){
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(false);
+        }
         player.setNickname(registerDTO.getNickname());
+        player.setWins(0);
         playerRepository.save(player);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body("Valeu");
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(true);
     }
     public ResponseEntity loginPlayer(LoginDto loginDto){
         Optional<Player> player = playerRepository.findByNicknameAndPassword(loginDto.getNickname(), base64.encodeAsString(
                 loginDto.getPassword().getBytes()
         ));
         if (player.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Erro ao logar no sistema, cheque as informações");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(false);
         }
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(player.get() + "Login realizado com sucesso");
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(playerMapper.toDTO(player.get()));
     }
 }

@@ -7,6 +7,7 @@ import br.com.jg.advancedquiz.model.Question;
 import br.com.jg.advancedquiz.repository.AlternativeRepository;
 import br.com.jg.advancedquiz.repository.QuestionRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -57,7 +58,7 @@ public class QuestionService {
         for (JsonQuestionDTO q : questions){
             Set<Alternative> alternativesSet = alternativeService.alternativeSet(q);
             Question questionToAdd = new Question();
-            questionToAdd.setQuestion(q.getQuestion());
+            questionToAdd.setQuestion(StringEscapeUtils.escapeHtml4(q.getQuestion()));
             questionToAdd.setAlternatives(alternativesSet);
             questionToAdd.setCorrectQuestionAlternativeID(alternativeRepository.findByDescription(q.getCorrect_answer()).getId());
             questionToAdd.setDifficulty(q.getDifficulty());

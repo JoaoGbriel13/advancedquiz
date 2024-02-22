@@ -1,5 +1,6 @@
 package br.com.jg.advancedquiz.controller;
 
+import br.com.jg.advancedquiz.dto.CheckAnswerDTO;
 import br.com.jg.advancedquiz.dto.StartGameplayDTO;
 import br.com.jg.advancedquiz.service.GameplayService;
 import org.springframework.http.ResponseEntity;
@@ -22,13 +23,17 @@ public class GameplayControler {
     public ResponseEntity getActiveQuestion(@PathVariable long gameplayId){
         return gameplayService.getActiveQuestion(gameplayId);
     }
+    @GetMapping("/score/{gameplayId}")
+    public ResponseEntity getScore(@PathVariable long gameplayId){
+        return gameplayService.getScore(gameplayId);
+    }
     @PostMapping("/start")
     public ResponseEntity startGameplay(@RequestBody StartGameplayDTO startGameplayDTO){
         return gameplayService.startGameplay(startGameplayDTO);
     }
-    @PostMapping("/{gameplayId}/{alternativeId}")
-    public ResponseEntity checkCorrect(@PathVariable long gameplayId, @PathVariable long alternativeId ){
-        return gameplayService.checkAnswerCorrect(gameplayId, alternativeId);
+    @PostMapping("/check")
+    public ResponseEntity checkCorrect(@RequestBody CheckAnswerDTO checkAnswerDTO){
+        return gameplayService.checkAnswerCorrect(checkAnswerDTO);
     }
 
 }
